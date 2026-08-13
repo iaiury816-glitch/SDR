@@ -100,7 +100,14 @@ function FormTarefaKanban({ negocio, onCancelar, onCriado }) {
       if (etapa !== negocio.etapa) {
         await chamarAcao('mover-etapa', { negocioId: negocio.negocio_id, etapa });
       }
-      await chamarAcao('criar-tarefa', { negocioId: negocio.negocio_id, texto, quando });
+      await chamarAcao('criar-tarefa', {
+        negocioId: negocio.negocio_id,
+        texto,
+        quando,
+        empresa: negocio.empresa,
+        decisor: negocio.decisor,
+        telefone: negocio.telefone,
+      });
       onCriado();
     } catch (e) {
       setEnviando(false);

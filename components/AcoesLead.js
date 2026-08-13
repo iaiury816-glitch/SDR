@@ -56,7 +56,7 @@ export function ModalDescarte({ empresa, onCancelar, onConfirmar }) {
   );
 }
 
-export function FormNegocio({ id, onCancelar, onCriado }) {
+export function FormNegocio({ id, empresa, decisor, telefone, onCancelar, onCriado }) {
   const amanha = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const [data, setData] = useState(amanha.toISOString().slice(0, 10));
   const [hora, setHora] = useState('09:00');
@@ -67,7 +67,7 @@ export function FormNegocio({ id, onCancelar, onCriado }) {
     setEnviando(true);
     const quando = data && hora ? `${data}T${hora}:00-03:00` : null;
     try {
-      const r = await chamarAcao('negocio', { id, texto, quando });
+      const r = await chamarAcao('negocio', { id, texto, quando, empresa, decisor, telefone });
       onCriado(r);
     } catch (e) {
       setEnviando(false);
@@ -177,6 +177,9 @@ export function StatusEAcoesLead({ lead, onLigado, onRemover, onNegocioCriado, s
       ) : mostrarNegocio ? (
         <FormNegocio
           id={lead.id}
+          empresa={lead.empresa}
+          decisor={lead.decisor}
+          telefone={lead.telefone}
           onCancelar={() => setMostrarNegocio(false)}
           onCriado={(r) => { setNegocioEtapa(r.etapa); setMostrarNegocio(false); onNegocioCriado && onNegocioCriado(r); }}
         />

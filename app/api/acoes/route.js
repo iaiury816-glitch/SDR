@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { criarEventoCalendario } from '../../../lib/calendario';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -56,7 +57,7 @@ export async function POST(req) {
     }
 
     if (acao === 'negocio') {
-      const { id, texto, quando } = body;
+      const { id, texto, quando, empresa, decisor, telefone } = body;
       if (!isValidUuid(id)) return erroInput();
       const { data, error } = await sb.rpc('criar_negocio', {
         p_lead_id: id,
@@ -64,6 +65,7 @@ export async function POST(req) {
         p_tarefa_quando: quando || null,
       });
       if (error) throw error;
+      if (quando) await criarEventoCalendario({ empresa, decisor, telefone, texto, quando });
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -90,7 +92,7 @@ export async function POST(req) {
     }
 
     if (acao === 'criar-tarefa') {
-      const { negocioId, texto, quando } = body;
+      const { negocioId, texto, quando, empresa, decisor, telefone } = body;
       if (!isValidUuid(negocioId)) return erroInput();
       const { data, error } = await sb.rpc('criar_tarefa', {
         p_negocio_id: negocioId,
@@ -98,6 +100,7 @@ export async function POST(req) {
         p_quando: quando || null,
       });
       if (error) throw error;
+      if (quando) await criarEventoCalendario({ empresa, decisor, telefone, texto, quando });
       return NextResponse.json({ ok: true, resultado: data });
     }
 
