@@ -196,3 +196,38 @@ body {
   font-family: inherit;
 }
 .agendor-form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+
+.empresa-nome-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--cor-texto);
+  cursor: pointer;
+  text-align: left;
+}
+.empresa-nome-link:hover { color: var(--cor-marca-escura); text-decoration: underline; }
+
+.historico-caixa { width: 560px; max-width: 94vw; max-height: 86vh; overflow-y: auto; }
+.historico-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.historico-timeline { display: flex; flex-direction: column; gap: 10px; }
+.historico-item {
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--cor-fundo);
+}
+.historico-item-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.historico-resumo {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--cor-texto-suave);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 8px;
+}
+.historico-resumo-aguardando { margin-top: 8px; font-size: 12.5px; color: var(--cor-texto-fraco); font-style: italic; }
+.historico-resumo-erro { margin-top: 8px; font-size: 12.5px; color: var(--cor-perigo); }
