@@ -78,6 +78,29 @@ export async function POST(req) {
       return NextResponse.json({ ok: true, resultado: data });
     }
 
+    if (acao === 'mover-etapa') {
+      const { negocioId, etapa } = body;
+      if (!isValidUuid(negocioId) || !etapa) return erroInput();
+      const { data, error } = await sb.rpc('definir_etapa_negocio', {
+        p_negocio_id: negocioId,
+        p_etapa: etapa,
+      });
+      if (error) throw error;
+      return NextResponse.json({ ok: true, resultado: data });
+    }
+
+    if (acao === 'criar-tarefa') {
+      const { negocioId, texto, quando } = body;
+      if (!isValidUuid(negocioId)) return erroInput();
+      const { data, error } = await sb.rpc('criar_tarefa', {
+        p_negocio_id: negocioId,
+        p_texto: texto || null,
+        p_quando: quando || null,
+      });
+      if (error) throw error;
+      return NextResponse.json({ ok: true, resultado: data });
+    }
+
     return NextResponse.json({ ok: false, erro: 'Ação desconhecida' }, { status: 400 });
   } catch (e) {
     const msg = String((e && e.message) || e);

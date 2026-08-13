@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const LINKS = [
   { href: '/', label: 'Hoje' },
   { href: '/todos', label: 'Todos os leads' },
+  { href: '/negocios', label: 'Negócios' },
 ];
 
 export default function NavTopo() {
