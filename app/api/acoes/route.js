@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { criarEventoCalendario } from '../../../lib/calendario';
+import { registrarInteracaoPainel, iniciarLigacaoPainel } from '../../../lib/controleFoco';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -25,6 +26,7 @@ export async function POST(req) {
       if (!isValidUuid(id)) return erroInput();
       const { data, error } = await sb.rpc('marcar_enviado', { p_lead_id: id });
       if (error) throw error;
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -33,6 +35,7 @@ export async function POST(req) {
       if (!isValidUuid(id)) return erroInput();
       const { data, error } = await sb.rpc('marcar_sem_whatsapp', { p_id: id });
       if (error) throw error;
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -45,6 +48,7 @@ export async function POST(req) {
         p_tarefa_id: isValidUuid(tarefaId) ? tarefaId : null,
       });
       if (error) throw error;
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -53,6 +57,9 @@ export async function POST(req) {
       if (!isValidUuid(id)) return erroInput();
       const { data, error } = await sb.rpc('ligar_api4com', { p_lead_id: id });
       if (error) throw error;
+      // Uma ligação de verdade pode passar dos 5min sem nenhum clique no painel — entra no
+      // estado 'ligacao' (não acumula ociosidade) em vez de só registrar uma interação pontual.
+      await iniciarLigacaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -66,6 +73,7 @@ export async function POST(req) {
       });
       if (error) throw error;
       if (quando) await criarEventoCalendario({ empresa, decisor, telefone, texto, quando });
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -77,6 +85,7 @@ export async function POST(req) {
         p_ignorar_ligacao: !!ignorarLigacao,
       });
       if (error) throw error;
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -88,6 +97,7 @@ export async function POST(req) {
         p_etapa: etapa,
       });
       if (error) throw error;
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 
@@ -101,6 +111,7 @@ export async function POST(req) {
       });
       if (error) throw error;
       if (quando) await criarEventoCalendario({ empresa, decisor, telefone, texto, quando });
+      await registrarInteracaoPainel();
       return NextResponse.json({ ok: true, resultado: data });
     }
 

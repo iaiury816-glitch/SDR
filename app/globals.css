@@ -455,3 +455,48 @@ a.stat-pill:hover { border-color: var(--cor-marca-borda); background: var(--cor-
 .metrica-card-sub { color: var(--cor-texto-fraco); font-size: 11.5px; }
 .metrica-aviso { border-color: var(--cor-atencao-borda); background: var(--cor-atencao-clara); }
 .metrica-alerta { border-color: var(--cor-perigo-borda); background: var(--cor-perigo-clara); }
+
+/* Controle de foco (sistema de "redução de elo" por ociosidade) + banner de pausa de cadência —
+   portados do artefato original. */
+.banner-pausa-cadencia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  margin: 0 0 10px;
+  border-radius: 10px;
+  background: var(--cor-atencao-clara);
+  border: 1px solid var(--cor-atencao-borda);
+  color: var(--cor-atencao);
+  font-size: 14px;
+  font-weight: 600;
+}
+.banner-pausa-cadencia button { flex: 0 0 auto; }
+
+.controle-foco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: 14px;
+  padding: 11px 16px;
+  flex: 0 0 auto;
+  min-width: 168px;
+}
+.controle-foco-estado { font-size: 13px; font-weight: 700; text-align: center; }
+.controle-foco-pausa { color: var(--cor-atencao); }
+.controle-foco-almoco { color: var(--cor-texto-suave); }
+.controle-foco-reuniao { color: var(--cor-marca); }
+.controle-foco-ligacao { color: var(--cor-sucesso); }
+.controle-foco-timer { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--cor-texto-suave); }
+.controle-foco-timer-alerta { color: var(--cor-perigo); }
+.controle-foco-penalidade { font-size: 12px; color: var(--cor-texto-fraco); display: flex; align-items: center; gap: 6px; }
+.controle-foco-botoes { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+@media (max-width: 780px) {
+  .controle-foco { min-width: 0; }
+}
