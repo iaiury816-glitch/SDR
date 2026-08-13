@@ -154,6 +154,39 @@ a.stat-pill:hover { border-color: var(--cor-marca-borda); background: var(--cor-
 .kanban-card { cursor: grab; }
 .kanban-card:active { cursor: grabbing; }
 
+.alarme-toasts-container {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+  max-width: 320px;
+}
+.alarme-toast {
+  position: relative;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-marca-borda);
+  border-left: 4px solid var(--cor-marca);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.14);
+}
+.alarme-toast-fechar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--cor-texto-fraco);
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.alarme-toast-fechar:hover { color: var(--cor-texto); }
+
 .col-titulo {
   font-weight: 600;
   font-size: 14px;

@@ -1,6 +1,7 @@
 'use client';
 
 import NavTopo from './NavTopo';
+import AlarmeTarefas from './AlarmeTarefas';
 
 export default function Cabecalho({ titulo, sub, acoes }) {
   async function sair() {
@@ -17,6 +18,7 @@ export default function Cabecalho({ titulo, sub, acoes }) {
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
         {acoes}
+        <AlarmeTarefas />
         <button className="btn" onClick={sair}>Sair</button>
       </div>
     </div>
