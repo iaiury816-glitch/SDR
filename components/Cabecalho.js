@@ -2,6 +2,7 @@
 
 import NavTopo from './NavTopo';
 import AlarmeTarefas from './AlarmeTarefas';
+import TierHeaderBadges from './TierHeaderBadges';
 
 export default function Cabecalho({ titulo, sub, acoes }) {
   async function sair() {
@@ -16,7 +17,8 @@ export default function Cabecalho({ titulo, sub, acoes }) {
         {sub ? <div className="sub">{sub}</div> : null}
         <NavTopo />
       </div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <TierHeaderBadges />
         {acoes}
         <AlarmeTarefas />
         <button className="btn" onClick={sair}>Sair</button>
