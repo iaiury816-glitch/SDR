@@ -51,7 +51,23 @@ body {
 .topo h1 { font-size: 17px; margin: 0; }
 .topo .sub { color: var(--cor-texto-fraco); font-size: 13px; margin-bottom: 8px; }
 
-.nav-topo { display: flex; gap: 4px; }
+.nav-topo-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-superficie);
+  color: var(--cor-texto-suave);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sidebar-toggle:hover { background: var(--cor-superficie-alt); color: var(--cor-texto); }
+.sidebar-toggle svg { width: 18px; height: 18px; }
+.nav-topo { display: flex; gap: 4px; flex-wrap: wrap; }
 .nav-link {
   font-size: 12.5px;
   color: var(--cor-texto-suave);
