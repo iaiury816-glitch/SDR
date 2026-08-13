@@ -19,7 +19,18 @@ export async function POST(req) {
     return NextResponse.json({ ok: false, erro: 'Senha incorreta' }, { status: 401 });
   }
 
-  const token = await criarSessionToken(process.env.SESSION_SECRET || '');
+  const sessionSecret = process.env.SESSION_SECRET;
+  if (!sessionSecret) {
+    return NextResponse.json({ ok: false, erro: 'SESSION_SECRET não configurada no servidor' }, { status: 500 });
+  }
+
+  let token;
+  try {
+    token = await criarSessionToken(sessionSecret);
+  } catch (e) {
+    return NextResponse.json({ ok: false, erro: 'Falha ao gerar sessão: ' + String((e && e.message) || e) }, { status: 500 });
+  }
+
   const res = NextResponse.json({ ok: true });
   res.cookies.set('sdr_session', token, {
     httpOnly: true,
