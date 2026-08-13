@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Suspense, useEffect, useState, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { IconeTelefone, IconePessoa } from '../../components/icones';
 import { StatusEAcoesLead } from '../../components/AcoesLead';
 import HistoricoModal from '../../components/HistoricoModal';
 import Cabecalho from '../../components/Cabecalho';
+import BarraCadencia from '../../components/BarraCadencia';
 import { formatarTelefoneExibicao } from '../../lib/client';
 
 const FILTROS_STATUS = [
@@ -13,12 +15,24 @@ const FILTROS_STATUS = [
   { valor: 'descartados', label: 'Descartados' },
 ];
 
-export default function TodosOsLeads() {
+const LABEL_ETAPA = { '1': 'Dia 1', '3': 'Dia 03', '5': 'Dia 05', '7': 'Dia 07', '10': 'Dia 10' };
+
+export default function TodosOsLeadsPagina() {
+  return (
+    <Suspense fallback={<div className="loading">Carregando...</div>}>
+      <TodosOsLeads />
+    </Suspense>
+  );
+}
+
+function TodosOsLeads() {
+  const searchParams = useSearchParams();
   const [leads, setLeads] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erroGeral, setErroGeral] = useState('');
   const [historicoLeadId, setHistoricoLeadId] = useState(null);
-  const [statusFiltro, setStatusFiltro] = useState('todos');
+  const [statusFiltro, setStatusFiltro] = useState(() => searchParams.get('status') || 'todos');
+  const [etapaFiltro, setEtapaFiltro] = useState(() => searchParams.get('etapa') || '');
   const [ordenacao, setOrdenacao] = useState('empresa'); // 'empresa' | 'recente'
 
   const carregar = useCallback(async () => {
@@ -46,6 +60,7 @@ export default function TodosOsLeads() {
     let lista = leads;
     if (statusFiltro === 'ativos') lista = lista.filter((l) => l.status !== 'descartado');
     else if (statusFiltro === 'descartados') lista = lista.filter((l) => l.status === 'descartado');
+    if (etapaFiltro) lista = lista.filter((l) => String(l.etapa_dia) === String(etapaFiltro));
 
     lista = [...lista];
     if (ordenacao === 'recente') {
@@ -54,7 +69,7 @@ export default function TodosOsLeads() {
       lista.sort((a, b) => (a.empresa || '').localeCompare(b.empresa || '', 'pt-BR'));
     }
     return lista;
-  }, [leads, statusFiltro, ordenacao]);
+  }, [leads, statusFiltro, etapaFiltro, ordenacao]);
 
   return (
     <div>
@@ -65,6 +80,8 @@ export default function TodosOsLeads() {
       />
 
       <div className="container">
+        <BarraCadencia />
+
         {erroGeral ? <div className="aviso" style={{ marginBottom: 14 }}>{erroGeral}</div> : null}
 
         <div className="filtros-bar">
@@ -78,6 +95,11 @@ export default function TodosOsLeads() {
                 {f.label}
               </button>
             ))}
+            {etapaFiltro ? (
+              <button className="tab tab-active" onClick={() => setEtapaFiltro('')}>
+                {LABEL_ETAPA[etapaFiltro] || `Etapa ${etapaFiltro}`} ✕
+              </button>
+            ) : null}
           </div>
           <button
             className={`tab${ordenacao === 'recente' ? ' tab-active' : ''}`}

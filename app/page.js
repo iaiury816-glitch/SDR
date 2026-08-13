@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { IconeTelefone, IconePessoa } from '../components/icones';
 import { BotaoLigar, ModalDescarte, StatusEAcoesLead } from '../components/AcoesLead';
 import HistoricoModal from '../components/HistoricoModal';
 import Cabecalho from '../components/Cabecalho';
+import BarraCadencia from '../components/BarraCadencia';
 import { formatarTelefoneExibicao, chamarAcao, mensagemErro } from '../lib/client';
 
 export default function Home() {
@@ -57,6 +58,10 @@ export default function Home() {
       />
 
       <div className="container">
+        <Suspense fallback={null}>
+          <BarraCadencia statsCounts={statsCounts} />
+        </Suspense>
+
         {erroGeral ? <div className="aviso" style={{ marginBottom: 14 }}>{erroGeral}</div> : null}
 
         {carregando ? (
