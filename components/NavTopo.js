@@ -9,6 +9,7 @@ const LINKS = [
   { href: '/todos', label: 'Todos os leads' },
   { href: '/negocios', label: 'Negócios' },
   { href: '/metricas', label: 'Métricas' },
+  { href: '/buscar-leads', label: 'Buscar leads' },
 ];
 
 export default function NavTopo() {

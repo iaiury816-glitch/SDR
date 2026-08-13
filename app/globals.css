@@ -567,3 +567,15 @@ a.stat-pill:hover { border-color: var(--cor-marca-borda); background: var(--cor-
 .busca-global-vazio { padding: 16px 14px; text-align: center; color: var(--cor-texto-fraco); font-size: 13px; }
 .busca-global-vertodos { padding: 10px 14px; text-align: center; font-size: 13px; font-weight: 600; color: var(--cor-marca); cursor: pointer; border-top: 1px solid var(--cor-borda); }
 .busca-global-vertodos:hover { background: var(--cor-fundo); }
+
+/* Aba "Buscar leads" (sourcing) — portado do artefato original. */
+.sourcing-wrap { max-width: 640px; }
+.sourcing-card { background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: 12px; padding: 20px; }
+.sourcing-card p { margin: 0 0 12px; font-size: 15px; line-height: 1.5; color: var(--cor-texto); }
+.sourcing-card p:last-of-type { margin-bottom: 0; }
+.sourcing-aviso { color: var(--cor-texto-suave); font-size: 14px; }
+.sourcing-status { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--cor-borda); }
+.sourcing-status.erro .field-value { color: var(--cor-perigo); }
+.sourcing-status.ok .field-value { color: var(--cor-sucesso); }
+.sourcing-erro-detalhe { font-size: 13px; color: var(--cor-texto-fraco); margin-top: 4px; }
+.field-value.vazio { color: var(--cor-texto-fraco); font-style: italic; }
