@@ -3,10 +3,14 @@
 import { useState } from 'react';
 import { IconeTelefone, IconePessoa } from './icones';
 import { BotaoLigar } from './AcoesLead';
+import BotaoCopiar from './BotaoCopiar';
+import EditarTarefaForm from './EditarTarefaForm';
+import FormProximaTarefa from './FormProximaTarefa';
 import { chamarAcao, mensagemErro, formatarTelefoneExibicao, formatarDataHora, ETAPAS_FUNIL } from '../lib/client';
 
 export default function CartaoNegocio({ negocio, onMudou, onAbrirHistorico, arrastavel }) {
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [editando, setEditando] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const idx = ETAPAS_FUNIL.indexOf(negocio.etapa);
 
@@ -47,15 +51,27 @@ export default function CartaoNegocio({ negocio, onMudou, onAbrirHistorico, arra
         {negocio.empresa}{negocio.sem_whatsapp ? ' · Sem WhatsApp' : ''}
       </button>
       <div className="card-meta" style={{ marginTop: 6 }}>
-        <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(negocio.telefone)}</span></div>
+        <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(negocio.telefone)}</span><BotaoCopiar valor={negocio.telefone} /></div>
         {negocio.decisor ? <div className="card-meta-item"><IconePessoa /><span>{negocio.decisor}</span></div> : null}
       </div>
 
       {mostrarForm ? (
-        <FormTarefaKanban
-          negocio={negocio}
-          onCancelar={() => setMostrarForm(false)}
+        <FormProximaTarefa
+          negocioId={negocio.negocio_id}
+          etapaAtual={negocio.etapa}
+          empresa={negocio.empresa}
+          decisor={negocio.decisor}
+          telefone={negocio.telefone}
           onCriado={() => { setMostrarForm(false); onMudou(); }}
+          onPular={() => { setMostrarForm(false); onMudou(); }}
+        />
+      ) : editando && negocio.proxima_tarefa ? (
+        <EditarTarefaForm
+          tarefaId={negocio.proxima_tarefa.id}
+          textoAtual={negocio.proxima_tarefa.texto}
+          quandoAtual={negocio.proxima_tarefa.quando}
+          onSalvo={() => { setEditando(false); onMudou(); }}
+          onCancelar={() => setEditando(false)}
         />
       ) : negocio.proxima_tarefa ? (
         <div className="field">
@@ -65,6 +81,7 @@ export default function CartaoNegocio({ negocio, onMudou, onAbrirHistorico, arra
             <div className="field-label">{formatarDataHora(negocio.proxima_tarefa.quando)}</div>
           ) : null}
           <div className="actions" style={{ marginTop: 8 }}>
+            <button className="btn btn-secondary" onClick={() => setEditando(true)} disabled={ocupado}>Editar</button>
             <button className="btn btn-secondary" onClick={concluirTarefa} disabled={ocupado || !negocio.tem_ligacao}>
               Concluir
             </button>
@@ -80,56 +97,6 @@ export default function CartaoNegocio({ negocio, onMudou, onAbrirHistorico, arra
         <BotaoLigar id={negocio.lead_id} onLigado={onMudou} />
         <button className="btn" onClick={() => mover(-1)} disabled={ocupado || idx <= 0}>← Etapa</button>
         <button className="btn" onClick={() => mover(1)} disabled={ocupado || idx >= ETAPAS_FUNIL.length - 1}>Etapa →</button>
-      </div>
-    </div>
-  );
-}
-
-function FormTarefaKanban({ negocio, onCancelar, onCriado }) {
-  const amanha = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const [data, setData] = useState(amanha.toISOString().slice(0, 10));
-  const [hora, setHora] = useState('09:00');
-  const [texto, setTexto] = useState('Retomar contato');
-  const [etapa, setEtapa] = useState(negocio.etapa);
-  const [enviando, setEnviando] = useState(false);
-
-  async function confirmar() {
-    setEnviando(true);
-    const quando = data && hora ? `${data}T${hora}:00-03:00` : null;
-    try {
-      if (etapa !== negocio.etapa) {
-        await chamarAcao('mover-etapa', { negocioId: negocio.negocio_id, etapa });
-      }
-      await chamarAcao('criar-tarefa', {
-        negocioId: negocio.negocio_id,
-        texto,
-        quando,
-        empresa: negocio.empresa,
-        decisor: negocio.decisor,
-        telefone: negocio.telefone,
-      });
-      onCriado();
-    } catch (e) {
-      setEnviando(false);
-      window.alert(mensagemErro(e, 'Não consegui criar a tarefa agora. Tenta de novo em alguns segundos.'));
-    }
-  }
-
-  return (
-    <div className="field">
-      <div className="field-label">Etapa do funil</div>
-      <select className="agendor-input" value={etapa} onChange={(e) => setEtapa(e.target.value)} style={{ marginBottom: 8 }}>
-        {ETAPAS_FUNIL.map((et) => <option key={et} value={et}>{et}</option>)}
-      </select>
-      <div className="field-label">Quando retomar o contato</div>
-      <div className="agendor-form-row">
-        <input type="date" className="agendor-input" value={data} onChange={(e) => setData(e.target.value)} />
-        <input type="time" className="agendor-input" value={hora} onChange={(e) => setHora(e.target.value)} />
-      </div>
-      <textarea className="agendor-textarea" value={texto} onChange={(e) => setTexto(e.target.value)} />
-      <div className="actions" style={{ marginTop: 8 }}>
-        <button className="btn btn-agendor" onClick={confirmar} disabled={enviando}>{enviando ? 'Criando...' : 'Criar tarefa'}</button>
-        <button className="btn" onClick={onCancelar} disabled={enviando}>Concluir sem agendar</button>
       </div>
     </div>
   );

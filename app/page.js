@@ -3,6 +3,9 @@
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { IconeTelefone, IconePessoa } from '../components/icones';
 import { BotaoLigar, ModalDescarte, StatusEAcoesLead } from '../components/AcoesLead';
+import BotaoCopiar from '../components/BotaoCopiar';
+import EditarTarefaForm from '../components/EditarTarefaForm';
+import FormProximaTarefa from '../components/FormProximaTarefa';
 import HistoricoModal from '../components/HistoricoModal';
 import Cabecalho from '../components/Cabecalho';
 import BarraCadencia from '../components/BarraCadencia';
@@ -124,7 +127,7 @@ function LeadCard({ lead, removendo, onLigado, onRemover, onAbrirHistorico }) {
         {lead.empresa}{lead.sem_whatsapp ? ' · Sem WhatsApp' : ''}
       </button>
       <div className="card-meta" style={{ marginTop: 6 }}>
-        <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(lead.telefone)}</span></div>
+        <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(lead.telefone)}</span><BotaoCopiar valor={lead.telefone} /></div>
         {lead.decisor ? <div className="card-meta-item"><IconePessoa /><span>{lead.decisor}</span></div> : null}
       </div>
       <StatusEAcoesLead lead={lead} onLigado={onLigado} onRemover={onRemover} ocultarNome />
@@ -134,6 +137,9 @@ function LeadCard({ lead, removendo, onLigado, onRemover, onAbrirHistorico }) {
 
 function TarefaCard({ t, removendo, onLigado, onRemover, onAbrirHistorico }) {
   const [mostrarDescarte, setMostrarDescarte] = useState(false);
+  const [editando, setEditando] = useState(false);
+  const [concluida, setConcluida] = useState(false);
+  const [texto, setTexto] = useState(t.tarefa_texto);
   const [ocupado, setOcupado] = useState(false);
   const semLigacao = !t.tem_ligacao;
 
@@ -141,7 +147,12 @@ function TarefaCard({ t, removendo, onLigado, onRemover, onAbrirHistorico }) {
     setOcupado(true);
     try {
       await chamarAcao('concluir-tarefa', { tarefaId: t.tarefa_id, ignorarLigacao: true });
-      onRemover();
+      if (t.negocio_id) {
+        setOcupado(false);
+        setConcluida(true);
+      } else {
+        onRemover();
+      }
     } catch (e) {
       setOcupado(false);
       window.alert(mensagemErro(e, 'Não consegui concluir a tarefa agora. Tenta de novo em alguns segundos.'));
@@ -169,19 +180,44 @@ function TarefaCard({ t, removendo, onLigado, onRemover, onAbrirHistorico }) {
         <span className="status-badge">{t.etapa}</span>
       </div>
       <div className="card-meta">
-        <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(t.telefone)}</span></div>
+        <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(t.telefone)}</span><BotaoCopiar valor={t.telefone} /></div>
         {t.decisor ? <div className="card-meta-item"><IconePessoa /><span>{t.decisor}</span></div> : null}
       </div>
-      <div className="field">
-        <div className="field-label">O que fazer</div>
-        <div className="field-value">{t.tarefa_texto}</div>
-      </div>
-      {semLigacao ? <div className="aviso">Liga pro lead antes de Descartar.</div> : null}
-      <div className="actions">
-        {t.telefone ? <BotaoLigar id={t.lead_id} onLigado={onLigado} /> : null}
-        <button className="btn btn-secondary" onClick={concluir} disabled={ocupado}>Marcar concluída</button>
-        <button className="btn btn-danger" onClick={() => setMostrarDescarte(true)} disabled={ocupado || semLigacao}>Descartar</button>
-      </div>
+
+      {concluida ? (
+        <FormProximaTarefa
+          negocioId={t.negocio_id}
+          etapaAtual={t.etapa}
+          empresa={t.empresa}
+          decisor={t.decisor}
+          telefone={t.telefone}
+          onCriado={onRemover}
+          onPular={onRemover}
+        />
+      ) : editando ? (
+        <EditarTarefaForm
+          tarefaId={t.tarefa_id}
+          textoAtual={texto}
+          quandoAtual={t.quando}
+          onSalvo={(novoTexto) => { setTexto(novoTexto); setEditando(false); }}
+          onCancelar={() => setEditando(false)}
+        />
+      ) : (
+        <>
+          <div className="field">
+            <div className="field-label">O que fazer</div>
+            <div className="field-value">{texto}</div>
+          </div>
+          {semLigacao ? <div className="aviso">Liga pro lead antes de Descartar.</div> : null}
+          <div className="actions">
+            {t.telefone ? <BotaoLigar id={t.lead_id} onLigado={onLigado} /> : null}
+            <button className="btn btn-secondary" onClick={() => setEditando(true)} disabled={ocupado}>Editar</button>
+            <button className="btn btn-secondary" onClick={concluir} disabled={ocupado}>Marcar concluída</button>
+            <button className="btn btn-danger" onClick={() => setMostrarDescarte(true)} disabled={ocupado || semLigacao}>Descartar</button>
+          </div>
+        </>
+      )}
+
       {mostrarDescarte ? (
         <ModalDescarte
           empresa={t.empresa}

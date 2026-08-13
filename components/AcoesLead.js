@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import BotaoCopiar from './BotaoCopiar';
 import { chamarAcao, mensagemErro } from '../lib/client';
 
 export function BotaoLigar({ id, onLigado }) {
@@ -163,7 +164,10 @@ export function StatusEAcoesLead({ lead, onLigado, onRemover, onNegocioCriado, s
 
       {!semMensagem && lead.status === 'mensagem_pronta' && lead.mensagem_whatsapp ? (
         <div className="field">
-          <div className="field-label">Mensagem</div>
+          <div className="field-label" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            Mensagem
+            <BotaoCopiar valor={lead.mensagem_whatsapp} />
+          </div>
           <div className="mensagem">{lead.mensagem_whatsapp}</div>
         </div>
       ) : null}

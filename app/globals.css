@@ -500,3 +500,20 @@ a.stat-pill:hover { border-color: var(--cor-marca-borda); background: var(--cor-
 @media (max-width: 780px) {
   .controle-foco { min-width: 0; }
 }
+
+/* Botão "Copiar" (telefone, mensagem) — portado do artefato original. */
+.copy-btn {
+  background: var(--cor-superficie-alt);
+  color: var(--cor-texto-suave);
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--cor-borda); }
+.copy-btn.copied { background: var(--cor-sucesso-clara); color: var(--cor-sucesso); border-color: var(--cor-sucesso-borda); }
+.card-meta-item .copy-btn { margin-left: auto; }

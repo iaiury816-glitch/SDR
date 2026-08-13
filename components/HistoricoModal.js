@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { IconeTelefone, IconePessoa } from './icones';
 import { StatusEAcoesLead } from './AcoesLead';
+import BotaoCopiar from './BotaoCopiar';
+import EditarTarefaForm from './EditarTarefaForm';
+import FormProximaTarefa from './FormProximaTarefa';
 import { chamarAcao, mensagemErro, formatarTelefoneExibicao, formatarDuracao, formatarDataHora } from '../lib/client';
 
 // Modal de histórico: clicar no nome da empresa em qualquer lugar do painel
@@ -75,7 +78,7 @@ export default function HistoricoModal({ leadId, onClose, onLeadMudou }) {
             />
 
             <div className="card-meta" style={{ marginTop: 10 }}>
-              <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(lead.telefone)}</span></div>
+              <div className="card-meta-item"><IconeTelefone /><span>{formatarTelefoneExibicao(lead.telefone)}</span><BotaoCopiar valor={lead.telefone} /></div>
               {lead.decisor ? <div className="card-meta-item"><IconePessoa /><span>{lead.decisor}</span></div> : null}
             </div>
 
@@ -103,12 +106,19 @@ export default function HistoricoModal({ leadId, onClose, onLeadMudou }) {
 
 function ItemTimeline({ item, lead, onConcluido }) {
   const [ocupado, setOcupado] = useState(false);
+  const [editando, setEditando] = useState(false);
+  const [concluida, setConcluida] = useState(false);
 
   async function concluir() {
     setOcupado(true);
     try {
       await chamarAcao('concluir-tarefa', { tarefaId: item.tarefa_id });
-      onConcluido();
+      if (item.negocio_id) {
+        setOcupado(false);
+        setConcluida(true);
+      } else {
+        onConcluido();
+      }
     } catch (e) {
       setOcupado(false);
       window.alert(mensagemErro(e, 'Não consegui concluir a tarefa agora. Tenta de novo em alguns segundos.'));
@@ -156,6 +166,25 @@ function ItemTimeline({ item, lead, onConcluido }) {
   }
 
   // tarefa
+  if (concluida) {
+    return (
+      <div className="historico-item">
+        <div className="historico-item-topo">
+          <span className="status-badge status-pronto">Tarefa concluída</span>
+        </div>
+        <FormProximaTarefa
+          negocioId={item.negocio_id}
+          etapaAtual={lead.negocio_etapa}
+          empresa={lead.empresa}
+          decisor={lead.decisor}
+          telefone={lead.telefone}
+          onCriado={onConcluido}
+          onPular={onConcluido}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="historico-item">
       <div className="historico-item-topo">
@@ -164,14 +193,27 @@ function ItemTimeline({ item, lead, onConcluido }) {
         </span>
         <span className="field-label">{formatarDataHora(item.data)}</span>
       </div>
-      <div className="field-value">{item.texto}</div>
-      {!item.concluida && item.tarefa_id ? (
-        <div className="actions" style={{ marginTop: 8 }}>
-          <button className="btn btn-secondary" onClick={concluir} disabled={ocupado || !lead.tem_ligacao}>
-            Marcar concluída
-          </button>
-        </div>
-      ) : null}
+      {editando ? (
+        <EditarTarefaForm
+          tarefaId={item.tarefa_id}
+          textoAtual={item.texto}
+          quandoAtual={item.data}
+          onSalvo={onConcluido}
+          onCancelar={() => setEditando(false)}
+        />
+      ) : (
+        <>
+          <div className="field-value">{item.texto}</div>
+          {!item.concluida && item.tarefa_id ? (
+            <div className="actions" style={{ marginTop: 8 }}>
+              <button className="btn btn-secondary" onClick={() => setEditando(true)} disabled={ocupado}>Editar</button>
+              <button className="btn btn-secondary" onClick={concluir} disabled={ocupado || !lead.tem_ligacao}>
+                Marcar concluída
+              </button>
+            </div>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }

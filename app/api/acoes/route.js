@@ -101,6 +101,19 @@ export async function POST(req) {
       return NextResponse.json({ ok: true, resultado: data });
     }
 
+    if (acao === 'editar-tarefa') {
+      const { tarefaId, texto, quando } = body;
+      if (!isValidUuid(tarefaId) || !quando) return erroInput();
+      const { data, error } = await sb.rpc('editar_tarefa', {
+        p_tarefa_id: tarefaId,
+        p_texto: texto || null,
+        p_quando: quando,
+      });
+      if (error) throw error;
+      await registrarInteracaoPainel();
+      return NextResponse.json({ ok: true, resultado: data });
+    }
+
     if (acao === 'criar-tarefa') {
       const { negocioId, texto, quando, empresa, decisor, telefone } = body;
       if (!isValidUuid(negocioId)) return erroInput();
