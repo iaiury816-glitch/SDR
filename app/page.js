@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { IconeTelefone, IconePessoa } from '../components/icones';
 import { BotaoLigar, ModalDescarte, StatusEAcoesLead } from '../components/AcoesLead';
 import HistoricoModal from '../components/HistoricoModal';
+import Cabecalho from '../components/Cabecalho';
 import { formatarTelefoneExibicao, chamarAcao, mensagemErro } from '../lib/client';
 
 export default function Home() {
@@ -47,23 +48,13 @@ export default function Home() {
     setTarefas((ts) => ts.map((t) => (t.lead_id === id ? { ...t, tem_ligacao: valor } : t)));
   }
 
-  async function sair() {
-    await fetch('/api/logout', { method: 'POST' });
-    window.location.href = '/login';
-  }
-
   return (
     <div>
-      <div className="topo">
-        <div>
-          <h1>Painel SDR — Legare Gestão</h1>
-          <div className="sub">Leads do dia · {statsCounts.hoje || 0} pendências</div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn" onClick={carregar}>Atualizar</button>
-          <button className="btn" onClick={sair}>Sair</button>
-        </div>
-      </div>
+      <Cabecalho
+        titulo="Painel SDR — Legare Gestão"
+        sub={`Leads do dia · ${statsCounts.hoje || 0} pendências`}
+        acoes={<button className="btn" onClick={carregar}>Atualizar</button>}
+      />
 
       <div className="container">
         {erroGeral ? <div className="aviso" style={{ marginBottom: 14 }}>{erroGeral}</div> : null}
