@@ -5,6 +5,7 @@ import AlarmeTarefas from './AlarmeTarefas';
 import TierHeaderBadges from './TierHeaderBadges';
 import ControleFoco from './ControleFoco';
 import BannerPausaCadencia from './BannerPausaCadencia';
+import BuscaGlobal from './BuscaGlobal';
 
 export default function Cabecalho({ titulo, sub, acoes }) {
   async function sair() {
@@ -28,6 +29,9 @@ export default function Cabecalho({ titulo, sub, acoes }) {
           <AlarmeTarefas />
           <button className="btn" onClick={sair}>Sair</button>
         </div>
+      </div>
+      <div className="busca-global-wrap">
+        <BuscaGlobal />
       </div>
     </>
   );

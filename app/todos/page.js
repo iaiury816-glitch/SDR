@@ -7,7 +7,7 @@ import { StatusEAcoesLead } from '../../components/AcoesLead';
 import HistoricoModal from '../../components/HistoricoModal';
 import Cabecalho from '../../components/Cabecalho';
 import BarraCadencia from '../../components/BarraCadencia';
-import { formatarTelefoneExibicao } from '../../lib/client';
+import { formatarTelefoneExibicao, filtrarLeadsPorTexto } from '../../lib/client';
 
 const FILTROS_STATUS = [
   { valor: 'todos', label: 'Todos' },
@@ -33,6 +33,7 @@ function TodosOsLeads() {
   const [historicoLeadId, setHistoricoLeadId] = useState(null);
   const [statusFiltro, setStatusFiltro] = useState(() => searchParams.get('status') || 'todos');
   const [etapaFiltro, setEtapaFiltro] = useState(() => searchParams.get('etapa') || '');
+  const [busca, setBusca] = useState(() => searchParams.get('busca') || '');
   const [ordenacao, setOrdenacao] = useState('empresa'); // 'empresa' | 'recente'
 
   const carregar = useCallback(async () => {
@@ -52,12 +53,20 @@ function TodosOsLeads() {
 
   useEffect(() => { carregar(); }, [carregar]);
 
+  // Deep-link vindo da busca global do header (?abrir=<id>) — abre o histórico direto,
+  // sem precisar achar o card na lista de novo.
+  useEffect(() => {
+    const abrirId = searchParams.get('abrir');
+    if (abrirId) setHistoricoLeadId(abrirId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function marcarTemLigacao(id, valor) {
     setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, tem_ligacao: valor } : l)));
   }
 
   const leadsFiltrados = useMemo(() => {
-    let lista = leads;
+    let lista = filtrarLeadsPorTexto(leads, busca);
     if (statusFiltro === 'ativos') lista = lista.filter((l) => l.status !== 'descartado');
     else if (statusFiltro === 'descartados') lista = lista.filter((l) => l.status === 'descartado');
     if (etapaFiltro) lista = lista.filter((l) => String(l.etapa_dia) === String(etapaFiltro));
@@ -69,7 +78,7 @@ function TodosOsLeads() {
       lista.sort((a, b) => (a.empresa || '').localeCompare(b.empresa || '', 'pt-BR'));
     }
     return lista;
-  }, [leads, statusFiltro, etapaFiltro, ordenacao]);
+  }, [leads, busca, statusFiltro, etapaFiltro, ordenacao]);
 
   return (
     <div>
@@ -83,6 +92,17 @@ function TodosOsLeads() {
         <BarraCadencia />
 
         {erroGeral ? <div className="aviso" style={{ marginBottom: 14 }}>{erroGeral}</div> : null}
+
+        <div className="search-wrap">
+          <input
+            type="text"
+            className="search-box"
+            placeholder="Buscar por nome, decisor ou telefone (completo ou parcial)..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+          <div className="search-count">{leadsFiltrados.length} de {leads.length} leads</div>
+        </div>
 
         <div className="filtros-bar">
           <div className="tab-group">
